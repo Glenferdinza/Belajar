@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Price Predictor</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #3498db;
+      --primary-dark: #2980b9;
+      --secondary: #2ecc71;
+      --dark: #2c3e50;
+      --light: #ecf0f1;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: var(--dark);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    
+    .tagline {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border 0.3s ease;
+    }
+    
+    input:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+    
+    .btn {
+      display: inline-block;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow);
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+    
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+    
+    .result-section {
+      display: none;
+      text-align: center;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+      background-color: var(--light);
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    .price-display {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin: 15px 0;
+    }
+    
+    .car-icon {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 20px;
+      animation: spin 1s linear infinite;
+    }
+    
+    .error-message {
+      display: none;
+      color: var(--danger);
+      background-color: rgba(231, 76, 60, 0.1);
+      border: 1px solid var(--danger);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .feature-box {
+      display: flex;
+      gap: 20px;
+      margin-top: 40px;
+    }
+    
+    .feature {
+      flex: 1;
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    
+    .feature i {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+    
+    .feature h3 {
+      margin-bottom: 10px;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 20px 0;
+      color: #7f8c8d;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .feature-box {
+        flex-direction: column;
+      }
+    }
+    
+    /* Custom Range Slider Styling */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      background: #ddd;
+      outline: none;
+      margin-top: 10px;
+    }
+    
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+    }
+    
+    .range-value {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    
+    /* Car animation */
+    .car-container {
+      position: relative;
+      height: 60px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    
+    .car {
+      position: absolute;
+      font-size: 2rem;
+      animation: drive 3s linear infinite;
+    }
+    
+    @keyframes drive {
+      0% { left: -50px; }
+      100% { left: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-car"></i> Car Price Predictor</h1>
+      <p class="tagline">Prediksi harga mobil Anda dengan cepat dan akurat</p>
+    </header>
+    
+    <div class="card">
+      <div class="error-message" id="errorMessage">
+        <i class="fas fa-exclamation-circle"></i> Terjadi kesalahan. Silakan coba lagi.
+      </div>
+      
+      <form id="predictionForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="year">Tahun Kendaraan</label>
+            <input type="range" id="year" min="1990" max="2023" value="2015" 
+                   oninput="document.getElementById('yearValue').textContent = this.value">
+            <div class="range-value" id="yearValue">2015</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="engineSize">Ukuran Mesin (Liter)</label>
+            <input type="number" id="engineSize" step="0.1" min="0.5" max="6.0" value="2.0" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mileage">Jarak Tempuh (Kilometer)</label>
+            <input type="number" id="mileage" min="0" step="1000" value="50000" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="doors">Jumlah Pintu</label>
+            <input type="number" id="doors" min="2" max="5" value="4" required>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="ownerCount">Jumlah Pemilik Sebelumnya</label>
+          <input type="range" id="ownerCount" min="0" max="5" value="1" 
+                 oninput="document.getElementById('ownerValue').textContent = this.value">
+          <div class="range-value" id="ownerValue">1</div>
+        </div>
+        
+        <button type="submit" class="btn btn-block">
+          <i class="fas fa-calculator"></i> Prediksi Harga
+        </button>
+      </form>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Memproses prediksi...</p>
+      </div>
+      
+      <div class="result-section" id="resultSection">
+        <div class="car-icon">
+          <i class="fas fa-car-side"></i>
+        </div>
+        <h2>Estimasi Harga Mobil Anda</h2>
+        <div class="price-display" id="predictedPrice">$25,500.00</div>
+        <p>Estimasi harga berdasarkan kondisi dan spesifikasi yang diinput</p>
+        
+        <div class="car-container">
+          <div class="car">
+            <i class="fas fa-car-side"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="feature-box">
+      <div class="feature">
+        <i class="fas fa-tachometer-alt"></i>
+        <h3>Cepat & Akurat</h3>
+        <p>Prediksi instan berdasarkan model machine learning canggih</p>
+      </div>
+      
+      <div class="feature">
+        <i class="fas fa-database"></i>
+        <h3>Data Terkini</h3>
+        <p>Menggunakan data pasar terbaru untuk hasil yang relevan</p>
+      </div>
+      
+      <div class="feature">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Terpercaya</h3>
+        <p>Algoritma dilatih dengan ribuan data mobil bekas</p>
+      </div>
+    </div>
+    
+    <footer>
+      &copy; 2025 Car Price Predictor | Powered by Machine Learning
+    </footer>
+  </div>
+  
+  <script>
+    document.getElementById('predictionForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = {
+        Year: parseInt(document.getElementById('year').value),
+        Engine_Size: parseFloat(document.getElementById('engineSize').value),
+        Mileage: parseInt(document.getElementById('mileage').value),
+        Doors: parseInt(document.getElementById('doors').value),
+        Owner_Count: parseInt(document.getElementById('ownerCount').value)
+      };
+      
+      // Show loading indicator
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('resultSection').style.display = 'none';
+      document.getElementById('errorMessage').style.display = 'none';
+      
+      // Replace with your actual Heroku app URL
+      const apiUrl = 'https://your-app-name.herokuapp.com/predict';
+      
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Hide loading indicator
+        document.getElementById('loading').style.display = 'none';
+        
+        // Display result
+        document.getElementById('predictedPrice').textContent = data.predicted_price;
+        document.getElementById('resultSection').style.display = 'block';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'block';
+      });
+    });
+  </script>
+</body>
+</html>
